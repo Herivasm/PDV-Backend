@@ -44,7 +44,7 @@ export class SuppliersService extends PrismaClient implements OnModuleInit {
       throw new NotFoundException('Proveedor no encontrado');
     }
 
-    return this.supplier.findUnique({ where: { id } })
+    return supplier;
   }
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {

@@ -44,7 +44,7 @@ export class CategoriesService extends PrismaClient implements OnModuleInit {
       throw new NotFoundException('Categoría no encontrada');
     }
 
-    return this.category.findUnique({ where: { id } })
+    return category;
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
