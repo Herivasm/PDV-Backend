@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { IdValidationPipe } from 'src/common/pipes/id-validation.pipe';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadImageService } from 'src/upload-image/upload-image.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) { }
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly uploadImageService: UploadImageService
+  ) { }
 
   @Post()
   create(
@@ -38,5 +43,11 @@ export class ProductsController {
   remove(
     @Param('id', IdValidationPipe) id: string) {
     return this.productsService.remove(id);
+  }
+
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.uploadImageService.uploadFile(file);
   }
 }
