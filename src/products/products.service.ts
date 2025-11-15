@@ -2,7 +2,8 @@ import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { PrismaClient } from 'generated/prisma';
+import { Prisma, PrismaClient } from 'generated/prisma';
+import { parse } from 'path';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -40,18 +41,35 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { page, limit } = paginationDto;
+    const { page, limit, search, category } = paginationDto;
 
-    const totalPages = await this.product.count({});
-    const lastPage = Math.ceil(totalPages / limit);
+    const where: Prisma.ProductWhereInput = {};
+
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: 'insensitive'
+      };
+    }
+
+    if (category) {
+      const categoryId = parseInt(category);
+
+      if (!isNaN(categoryId)) {
+        where.categoryId = categoryId;
+      }
+    }
+    const totalItems = await this.product.count({ where });
+    const lastPage = Math.ceil(totalItems / limit);
 
     return {
       data: await this.product.findMany({
         skip: (page - 1) * limit,
-        take: limit
+        take: limit,
+        where
       }),
       meta: {
-        totalPages,
+        totalPages: totalItems,
         page,
         lastPage
       }
