@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { IdValidationPipe } from 'src/common/pipes/id-validation.pipe';
@@ -14,8 +14,8 @@ export class SalesController {
   }
 
   @Get()
-  findAll() {
-    return this.salesService.findAll();
+  findAll(@Query('date') saleDate?: string) {
+    return this.salesService.findAll(saleDate);
   }
 
   @Get(':id')
