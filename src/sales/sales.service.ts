@@ -14,7 +14,7 @@ export class SalesService extends PrismaClient implements OnModuleInit {
       const total = createSaleDto.items.reduce((total, item) => total + (item.price * item.quantity), 0);
 
       const sale = await this.sale.create({
-        data: { 
+        data: {
           total
         }
       });
@@ -71,7 +71,11 @@ export class SalesService extends PrismaClient implements OnModuleInit {
     return this.sale.findMany({
       where,
       include: {
-        saleItems: true
+        saleItems: {
+          include: {
+            product: true
+          }
+        }
       }
     });
   }
